@@ -1,0 +1,20 @@
+.divMapClassName {
+    background-color: lightgray;
+    width: 500px;
+    height: 500px;
+    position: absolute;
+}
+
+.divPersoClassName {
+    background-color: red;
+    width: 20px;
+    height: 20px;
+    position: absolute;
+}
+
+.divItemClassName {
+    background-color: greenyellow;
+    width: 20px;
+    height: 20px;
+    position: absolute;
+}
