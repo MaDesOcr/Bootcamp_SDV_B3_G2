@@ -1,11 +1,40 @@
 
 import Personnage from "../Model/Personnage.js"
 import Item from "../Model/Item.js"
-import {RATIO} from "../Config/Configuration.js"
+import Enemy from "../Model/Enemy.js"
+import {RATIO, map} from "../Config/Configuration.js"
 
 let body = document.querySelector("body")
 let divPerso = document.createElement("div")
-let perso = new Personnage(8, 8)
+let perso
+//const???
+let divMap = document.createElement("div")
+let listeItems = []
+let listeEnemies = [] 
+let mapJeu = []
+
+let mapTemp = map.split("\n")
+mapTemp.forEach(element => {
+    mapJeu.push(element.split(""))
+})
+
+mapJeu.forEach((element1, index1) => {
+    element1.forEach((element2, index2)=>{
+        switch(element2){
+            case "P" :
+                perso = new Personnage(index1, index2)
+                break
+            case "I" :
+                listeItems.push(new Item(index1, index2))
+                break
+            case "E":
+                listeEnemies.push(new Enemy(index1, index2))
+                break
+        }
+    })
+})
+
+
 
 function displayPerso(){
     divPerso.style.marginLeft = (perso.posX*RATIO) + "px"
@@ -13,13 +42,11 @@ function displayPerso(){
 }
 
 
-//const???
-let divMap = document.createElement("div")
-let listeItems = []
 
 createElements()
 displayItems()
 displayPerso()
+displayEnemies()
 
 //display map et perso
 body.append(divMap)
@@ -36,6 +63,18 @@ function displayItems() {
     });
 }
 
+function displayEnemies(){
+    listeEnemies.forEach((element, index) => {
+        let divEnemy = document.createElement("div")
+        divEnemy.id = "divEnemy" + index
+        divEnemy.className = "divEnemyClassName"
+        divEnemy.style.marginLeft = (element.posX * RATIO) + "px"
+        divEnemy.style.marginTop = (element.posY * RATIO) + "px"
+        divMap.appendChild(divEnemy)
+    });
+}
+
+
 function generateRandomValue() {
     return Math.floor(Math.random() * 25)
 }
@@ -49,16 +88,20 @@ function createElements() {
     divPerso.id = "divPerso"
     divPerso.className = "divPersoClassName"
 
-    for (let i = 0; i < 3; i++) {
+   /* for (let i = 0; i < 3; i++) {
         listeItems.push(new Item(generateRandomValue(), generateRandomValue()))
-    }
+    }*/
+
+   /* for(let i = 0; i < 3; i++){
+        listeEnemies.push(new Enemy(generateRandomValue(), generateRandomValue()))
+    }*/
 }
 
 
 
 document.addEventListener("keydown", event => {
     switch (event.key) {
-        case "ArrowUp":
+        case "ArrowUp":   
             perso.posY--
             break
         case "ArrowDown":

@@ -6,14 +6,21 @@
 }
 
 .divPersoClassName {
-    background-color: red;
+    background-color: green;
     width: 20px;
     height: 20px;
     position: absolute;
 }
 
 .divItemClassName {
-    background-color: greenyellow;
+    background-color: yellow;
+    width: 20px;
+    height: 20px;
+    position: absolute;
+}
+
+.divEnemyClassName {
+    background-color: red;
     width: 20px;
     height: 20px;
     position: absolute;
