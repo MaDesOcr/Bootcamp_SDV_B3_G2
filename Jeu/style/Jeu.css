@@ -25,3 +25,10 @@
     height: 20px;
     position: absolute;
 }
+
+.divWallClassName {
+    background-color: black;
+    width: 20px;
+    height: 20px;
+    position: absolute;
+}
