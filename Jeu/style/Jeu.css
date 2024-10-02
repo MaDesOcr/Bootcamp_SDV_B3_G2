@@ -1,19 +1,15 @@
 .divMapClassName {
     background-color: lightgray;
-    width: 500px;
-    height: 500px;
     position: absolute;
 }
 
 .divPersoClassName {
-    background-color: green;
     width: 20px;
     height: 20px;
     position: absolute;
 }
 
 .divItemClassName {
-    background-color: yellow;
     width: 20px;
     height: 20px;
     position: absolute;
@@ -27,8 +23,14 @@
 }
 
 .divWallClassName {
-    background-color: black;
     width: 20px;
     height: 20px;
     position: absolute;
+}
+
+
+.divFirstEcranClassName{
+    background-color: white;
+    width: auto;
+    height: auto;
 }

@@ -3,26 +3,50 @@ import Personnage from "../Model/Personnage.js"
 import Item from "../Model/Item.js"
 import Enemy from "../Model/Enemy.js"
 import Wall from "../Model/Wall.js"
-import {RATIO, map} from "../Config/Configuration.js"
+import {RATIO} from "../Config/Configuration.js"
+//import fs from "fs"
+
+//const fr = require('fs') 
+//fs.readFile("../Config/Map.txt")
+
 
 let body = document.querySelector("body")
 let divPerso = document.createElement("div")
 let perso
 //const???
 let divMap = document.createElement("div")
+let divNbItems = document.createElement("p")
 let listeItems = []
 let listeEnemies = [] 
 let listeWall = []
 let mapJeu = []
+let illustrations
 
 
+async function readMap(){
+    const result = await fetch("./Config/Map.txt")
+        .then(response => response.text())
+    return result
+} 
 
-function lectureConfigMap(){
+async function readIllustration(){
+    const result = await fetch("./Config/Illustrations.json")
+    illustrations = await result.json()
+}
+
+async function lectureConfigMap(){
+
+    let map = await readMap()
+    await readIllustration()
+
     let mapTemp = map.split("\n")
+
+//ne doit pas être modifier
+
     mapTemp.forEach(element => {
         mapJeu.push(element.split(""))
     })
-    
+    console.log(mapJeu)
     
     mapJeu.forEach((element1, index1) => {
         element1.forEach((element2, index2)=>{
@@ -47,8 +71,9 @@ function lectureConfigMap(){
 function displayPerso(){
     divPerso.style.marginLeft = (perso.posX*RATIO) + "px"
     divPerso.style.marginTop = (perso.posY*RATIO) + "px"
+    divPerso.style.backgroundImage = `url(${illustrations["perso"]})`
+    divPerso.style.backgroundSize = "cover"
 }
-
 
 function displayWalls() {
     listeWall.forEach((element, index) => {
@@ -57,7 +82,10 @@ function displayWalls() {
         divWall.className = "divWallClassName"
         divWall.style.marginLeft = (element.posX * RATIO) + "px"
         divWall.style.marginTop = (element.posY * RATIO) + "px"
+        divWall.style.backgroundImage = `url(${illustrations["wall"]})`
+        divWall.style.backgroundSize = "cover"
         divMap.appendChild(divWall)
+
     });
 }
 
@@ -69,6 +97,8 @@ function displayItems() {
             divItem.className = "divItemClassName"
             divItem.style.marginLeft = (element.posX * RATIO) + "px"
             divItem.style.marginTop = (element.posY * RATIO) + "px"
+            divItem.style.backgroundImage = `url(${illustrations["item"]})`
+            divItem.style.backgroundSize = "cover"
             divMap.appendChild(divItem)
         }
     });
@@ -85,20 +115,21 @@ function displayEnemies(){
     });
 }
 
-
-function generateRandomValue() {
-    return Math.floor(Math.random() * 25)
-}
-
-//create maps perso, items
 function createElements() {
 
     divMap.id = "divMapId"
     divMap.className = "divMapClassName"
 
+    divMap.style.width = (mapJeu[0].length-1)*RATIO+"px"
+    divMap.style.height = mapJeu.length*RATIO+"px"
+
     divPerso.id = "divPerso"
     divPerso.className = "divPersoClassName"
 
+    divNbItems.id = "divNbItemsId"
+    divNbItems.className = "divNbItemsClassName"
+    divNbItems.innerHTML = perso.nbItemPickUp
+    body.append(divNbItems)
    /* for (let i = 0; i < 3; i++) {
         listeItems.push(new Item(generateRandomValue(), generateRandomValue()))
     }*/
@@ -107,10 +138,6 @@ function createElements() {
         listeEnemies.push(new Enemy(generateRandomValue(), generateRandomValue()))
     }*/
 }
-
-// parcourir notre mapJeu 
-//et visuellement représenter le mur (rouge) sur la carte
-
 
 function handleEnemiesCollision(){
     listeEnemies.forEach((enemy, index)=>{
@@ -133,7 +160,6 @@ function clearMap(){
     document.getElementById("divMapId").replaceChildren("")
 }
 
-
 function handleItems(){
     listeItems.forEach((item, index)=>{
         if (!item.pickUp && item.posX==perso.posX && item.posY==perso.posY){
@@ -142,6 +168,13 @@ function handleItems(){
             document.getElementById("divItem"+index).remove()
         }
     })
+    if(listeItems.length == perso.nbItemPickUp){
+        alert("Vitoire")
+        clearMap()
+        loadMap()
+    }
+    divNbItems.innerHTML = perso.nbItemPickUp
+
 }
 
 function changePosition(posX, posY){
@@ -149,6 +182,8 @@ function changePosition(posX, posY){
     perso.posX = posX
     perso.posY = posY
     mapJeu[perso.posY][perso.posX]="P"
+    handleEnemiesCollision()
+    handleItems()
 }
 
 function mouvementAllowed(x, y){
@@ -185,8 +220,7 @@ function miseEnPlaceDesEvent(){
             default:
                 console.log("MAUVAIS CHOIX")
             }
-            handleEnemiesCollision()
-            handleItems()
+            
             displayPerso()
 
     }
@@ -198,8 +232,9 @@ function displayMapAndPerso(){
     divMap.appendChild(divPerso)
 }
 
-function loadMap(){
-    lectureConfigMap()
+async function loadMap(){
+    
+    await lectureConfigMap()
     createElements()
     displayItems()
     displayPerso()
@@ -209,40 +244,32 @@ function loadMap(){
 }
 
 
-loadMap()
-miseEnPlaceDesEvent()
-
-
-
-//display map et perso
 
 
 
 
+//axe d'amélioration : ne pas faire avec un prompt :
+//utiliser un vrai formulaire avec un event sur un boutton
+//mettre une image de fond
 
-// ++++gestion des collisions mur
-//gestion des collisions enemies
-//authoriser le mouvement
-//checker les positions , si position commune, alert et reboot
+let divFirstEcran = document.createElement("div")
+divFirstEcran.id = "divFirstEcranId"
+divFirstEcran.className = "divFirstEcranClassName"
+body.append(divFirstEcran)
+let name = prompt("Give a name")
 
+if(name!=null){
+    body.removeChild(divFirstEcran)
+    loadMap()
+    miseEnPlaceDesEvent()
+    console.log(name)
+}
 
-
-//+++ pickup les items -> compteur d'item
-//-> + authorisation des mouvements vers item
-//-> check si on arrive sur un item
-//-> on arrive sur un item :
-//       on doit enlever l'item de mapJeu et trouver une facon de gérer la listeItems
-//       on doit enlever l'item du display (par son identifiant)
-//      on doit incrémenter le nbItem du perso
 
 
 //A faire
 //mouvement random des ennemies
-//illustrations
 //affichage item
-//condition de fin
-//page de lancement
-//lecture fichier pour map
 //map multiple?
 
 
